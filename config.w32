@@ -1,0 +1,7 @@
+ARG_ENABLE('strcmp95', 'strcmp95 support', 'no');
+
+if (PHP_STRCMP95 != 'no') {
+	AC_DEFINE('HAVE_STRCMP95', 1, "Define to 1 if the PHP extension 'strcmp95' is available.");
+
+	EXTENSION('strcmp95', 'strcmp95.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+}
