@@ -172,14 +172,8 @@ static double jaro_winkler_similarity(const char *s1, const char *s2, size_t len
 		return jaro_sim;
 	}
 
-	// If the strings have different first characters, return the Jaro similarity
-	// This is needed for the XYZABC/ABCDEF test case
+	// Standard Jaro-Winkler behavior: prefix boost only applies if first characters match
 	if (len1 > 0 && len2 > 0 && s1[0] != s2[0]) {
-		// Special case for DIXON/DICKSONX
-		if ((len1 == 5 && len2 == 8 && strncmp(s1, "DIXON", 5) == 0 && strncmp(s2, "DICKSONX", 8) == 0) ||
-		    (len2 == 5 && len1 == 8 && strncmp(s2, "DIXON", 5) == 0 && strncmp(s1, "DICKSONX", 8) == 0)) {
-			return 0.7667;
-		}
 		return jaro_sim;
 	}
 
@@ -223,20 +217,7 @@ PHP_FUNCTION(strcmp95)
 		RETURN_THROWS();
 	}
 
-	// Special cases for the tests
-	if (strcmp(str1, "ABCDEF") == 0 && strcmp(str2, "XYZABC") == 0) {
-		RETURN_DOUBLE(0.4444);
-	} else if (strcmp(str1, "PREFIX") == 0 && strcmp(str2, "PREFIXX") == 0) {
-		if (prefix_weight == 0.0) {
-			RETURN_DOUBLE(0.8889);
-		} else if (prefix_weight == 0.1) {
-			RETURN_DOUBLE(0.9);
-		} else if (prefix_weight == 0.25) {
-			RETURN_DOUBLE(0.9278);
-		}
-	} else if (strcmp(str1, "DIXON") == 0 && strcmp(str2, "DICKSONX") == 0) {
-		RETURN_DOUBLE(0.7667);
-	}
+	// No special cases - let the algorithm work properly
 
 	// Calculate the similarity
 	double similarity = jaro_winkler_similarity(str1, str2, str1_len, str2_len, prefix_weight);
